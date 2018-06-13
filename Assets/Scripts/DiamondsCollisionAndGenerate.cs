@@ -49,7 +49,7 @@ public class DiamondsCollisionAndGenerate : MonoBehaviour
             if (objType == 0)
             {
                 if (ObstaclePrefabs.Count > 0)
-                {
+                {// TODO: cos nie dziala czasem, za nisko pozycja ?
                     CreateNewObject(ObstaclePrefabs);
                     ObstaclesOnStart--;
                 }
@@ -73,15 +73,14 @@ public class DiamondsCollisionAndGenerate : MonoBehaviour
     void Update()
     {
         float gameCharacterDistance = gameObject.transform.position.z;
-        // Debug.Log (gameCharacterDistance);
-
+  
         foreach (GameObject obj in createdObject)
         {
             if (gameCharacterDistance > obj.transform.position.z + 10.0f)
             {
                 RemoveCreatedObject(obj);
                 break;
-            }
+            }            
         }
     }
 
@@ -122,11 +121,11 @@ public class DiamondsCollisionAndGenerate : MonoBehaviour
     {
         int newModelIndex = Random.Range(0, prefabsList.Count);
         float newModelX = possiblePaths.ElementAt(Random.Range(0, possiblePaths.Count)).Value;
-        float distanceForNewModel = Random.Range(5.0f, 15.0f);
+        float distanceForNewModel = Random.Range(5.0f, 12.0f);
         lastCreatedObjectPosstion += distanceForNewModel;
 
         GameObject newObjectModel = Instantiate(prefabsList[newModelIndex],
-            new Vector3(newModelX, -1.0f, lastCreatedObjectPosstion), Quaternion.identity);
+            new Vector3(newModelX, 0.0f, lastCreatedObjectPosstion), Quaternion.identity);
 
         createdObject.Add(newObjectModel);
     }
@@ -169,10 +168,9 @@ public class DiamondsCollisionAndGenerate : MonoBehaviour
         }
         else if (objToRemove.name.Contains(nameOfBackgroundObj))
         {
-            Debug.Log("elo");
             CreateNewBackgroundObj();
         }
-        Debug.Log(objToRemove.name);
+        //Debug.Log(objToRemove.name);
     }
 
     private void GameOver()
