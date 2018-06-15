@@ -15,6 +15,7 @@ public class DiamondsCollisionAndGenerate : MonoBehaviour
     public int ObstaclesOnStart = 15;
     public List<GameObject> ObstaclePrefabs;
     public List<GameObject> BackgroundObjPrefabs;
+    public GameObject MessageBox;
 
     private string nameOfDiamond = "Diamond";
     private string nameOfObstacle = "ToDie";
@@ -135,11 +136,11 @@ public class DiamondsCollisionAndGenerate : MonoBehaviour
         int newModelIndex = Random.Range(0, BackgroundObjPrefabs.Count);
 
         GameObject newObjectModel = Instantiate(BackgroundObjPrefabs[newModelIndex],
-            new Vector3(3.5f + Random.Range(0.0f, 2.0f), 0.0f, lastCreatedBackgroundObjectPosstion + Random.Range(2.0f, 5.0f)), Quaternion.identity);
+            new Vector3(3.6f + Random.Range(0.0f, 2.0f), 0.0f, lastCreatedBackgroundObjectPosstion + Random.Range(2.0f, 5.0f)), Quaternion.identity);
         createdObject.Add(newObjectModel);
 
         newObjectModel = Instantiate(BackgroundObjPrefabs[newModelIndex],
-            new Vector3(-3.5f - Random.Range(0.0f, 2.0f), 0.0f, lastCreatedBackgroundObjectPosstion + Random.Range(2.0f, 5.0f)), Quaternion.identity);
+            new Vector3(-3.6f - Random.Range(0.0f, 2.0f), 0.0f, lastCreatedBackgroundObjectPosstion + Random.Range(2.0f, 5.0f)), Quaternion.identity);
         createdObject.Add(newObjectModel);
 
         newObjectModel = Instantiate(BackgroundObjPrefabs[newModelIndex],
@@ -182,18 +183,37 @@ public class DiamondsCollisionAndGenerate : MonoBehaviour
         {
             string currentBestScore = File.ReadAllText(Application.persistentDataPath + bestScoreFileName);
 
+            Text textLabel = null;
+            UnityStandardAssets.Characters.ThirdPerson.ThirdPersonCharacter thirdPerson = gameObject.GetComponent<UnityStandardAssets.Characters.ThirdPerson.ThirdPersonCharacter>();
+            if (thirdPerson != null)
+            {
+                thirdPerson.m_MoveSpeedMultiplier = 0;
+                thirdPerson.m_AnimSpeedMultiplier = 0;
+                Transform child = MessageBox.transform.Find("InfoTextLabel");
+                textLabel = child.GetComponent<Text>();
+                
+            }
+
             if (int.Parse(currentBestScore) < points)
             {
                 File.WriteAllText(Application.persistentDataPath + bestScoreFileName, points.ToString());
-                // TODO: Show message about record
+                if (textLabel != null)
+                {
+                    textLabel.text = "Brawo! Właśnie pobiłeś rekord gry! Spróbuj swoich sił jeszcze raz :)";
+                    MessageBox.SetActive(true);
+                }
             }
             else
             {
-                // TODO: Show message
+                if (textLabel != null)
+                {
+                    textLabel.text = "Koniec gry! Niestety nie udało Ci się pobić rekordu. Spróbuj swoich sił jeszcze raz :)";
+                    MessageBox.SetActive(true);
+                }
             }
         }
 
         //Debug.Log("return to menu");
-        SceneManager.LoadScene("MainMenu");
+       // SceneManager.LoadScene("MainMenu");
     }
 }
