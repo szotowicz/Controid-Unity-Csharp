@@ -51,16 +51,16 @@ public class ComputersListManager : MonoBehaviour
         }
 
         if (portErrorMsg == null) return;
-        if (NetworkManager.instance.getNetworkState() == NetworkState.NET_SERVER)
+        if (NetworkManager.instance.GetNetworkState() == NetworkState.NET_SERVER)
             portErrorMsg.SetActive(false);
         else
             portErrorMsg.SetActive(true);
     }
 
     private void updateClients() {
-        if (NetworkManager.instance.getNetworkState() == NetworkState.NET_SERVER) {
+        if (NetworkManager.instance.GetNetworkState() == NetworkState.NET_SERVER) {
             var obj0 = new Q_PLAYERS_LIST_RESET();
-            NetworkManager.instance.sendToAllComputers(obj0);
+            NetworkManager.instance.SendToAllComputers(obj0);
             foreach (var a in comps)
             foreach (var b in a.players) {
                 var obj = new Q_PLAYERS_LIST_ELEMENT();
@@ -70,7 +70,7 @@ public class ComputersListManager : MonoBehaviour
                 obj.isAi = b.isAi;
                 obj.color = b.color;
                 obj.id = b.id;
-                NetworkManager.instance.sendToAllComputers(obj);
+                NetworkManager.instance.SendToAllComputers(obj);
             }
         }
     }
@@ -86,7 +86,7 @@ public class ComputersListManager : MonoBehaviour
     }
 
     public void refreshLogic() {
-        if (NetworkManager.instance.getNetworkState() == NetworkState.NET_SERVER) {
+        if (NetworkManager.instance.GetNetworkState() == NetworkState.NET_SERVER) {
             comps = new List<ComputersListElement>();
             foreach (var c in NetworkManager.instance.computers) {
                 var l = new ComputersListElement();
@@ -118,19 +118,19 @@ public class ComputersListManager : MonoBehaviour
 
         var losowyKolor = new Color(r, g, b);
         var playerNametmp = inputName.text;
-        if (NetworkManager.instance.getNetworkState() == NetworkState.NET_SERVER) {
-            NetworkManager.instance.addPlayer(playerNametmp,
-                new IPEndPoint(NetworkManager.instance.getMyIp(), NetworkManager.instance.port), toggle.isOn,
+        if (NetworkManager.instance.GetNetworkState() == NetworkState.NET_SERVER) {
+            NetworkManager.instance.AddPlayer(playerNametmp,
+                new IPEndPoint(NetworkManager.instance.GetMyIp(), NetworkManager.instance.port), toggle.isOn,
                 losowyKolor);
         }
         else {
-            if (NetworkManager.instance.getNetworkState() == NetworkState.NET_CLIENT) {
+            if (NetworkManager.instance.GetNetworkState() == NetworkState.NET_CLIENT) {
                 var obj = new Q_ADD_PLAYER();
                 obj.name = playerNametmp;
                 obj.isAi = toggle.isOn;
                 //ustalenie koloru !!!
                 obj.color = losowyKolor;
-                NetworkManager.instance.sendToServer(obj);
+                NetworkManager.instance.SendToServer(obj);
             }
         }
 
@@ -142,7 +142,7 @@ public class ComputersListManager : MonoBehaviour
         foreach (var element in comps) {
             var sb = Instantiate(compPrefab);
             sb.ip = element.ip.Address.ToString();
-            if (NetworkManager.instance.getMyIp().ToString() == element.ip.Address.ToString() &&
+            if (NetworkManager.instance.GetMyIp().ToString() == element.ip.Address.ToString() &&
                 element.ip.Port == NetworkManager.instance.port && serverMode)
                 sb.kickEnabled = false;
             else
@@ -162,7 +162,7 @@ public class ComputersListManager : MonoBehaviour
                 }
                 else {
                     pp.removeEnabled = false;
-                    if (NetworkManager.instance.getMyIp().ToString() == element.ip.Address.ToString() &&
+                    if (NetworkManager.instance.GetMyIp().ToString() == element.ip.Address.ToString() &&
                         element.ip.Port == NetworkManager.instance.port) pp.removeEnabled = true;
                 }
 

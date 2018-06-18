@@ -52,6 +52,49 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             }
         }
 
+        public void JumpCharacter()
+        {
+            m_Jump = true;
+        }
+
+        public bool TurnRight()
+        {
+            if (direction == possiblePaths["middle"])
+            {
+                currentVelocityOfChangingPosition = velocityOfChangingPosition;
+                direction = possiblePaths["right"];
+                isMoving = true;
+                return true;
+            }
+            else if (direction < possiblePaths["middle"])
+            {
+                currentVelocityOfChangingPosition = velocityOfChangingPosition;
+                direction = possiblePaths["middle"];
+                isMoving = true;
+                return true;
+            }
+            return false;
+        }
+
+        public bool TurnLeft()
+        {
+            if (direction == possiblePaths["middle"])
+            {
+                currentVelocityOfChangingPosition = velocityOfChangingPosition * -1;
+                direction = possiblePaths["left"];
+                isMoving = true;
+                return true;
+            }
+            else if (direction > possiblePaths["middle"])
+            {
+                currentVelocityOfChangingPosition = velocityOfChangingPosition * -1;
+                direction = possiblePaths["middle"];
+                isMoving = true;
+                return true;
+            }
+            return false;
+        }
+
         // Fixed update is called in sync with physics
         private void FixedUpdate()
         {
@@ -71,19 +114,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
                     // To right
                     if (h > 0 && !isMoving)
                     {
-                        if (direction == possiblePaths["middle"])
-                        {
-                            currentVelocityOfChangingPosition = velocityOfChangingPosition;
-                            direction = possiblePaths["right"];
-                            isMoving = true;
-                        }
-                        else if (direction < possiblePaths["middle"])
-                        {
-                            currentVelocityOfChangingPosition = velocityOfChangingPosition;
-                            direction = possiblePaths["middle"];
-                            isMoving = true;
-                        }
-                        else
+                        if (!TurnRight())
                         {
                             h = 0;
                         }
@@ -91,19 +122,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
                     // To left
                     if (h < 0 && !isMoving)
                     {
-                        if (direction == possiblePaths["middle"])
-                        {
-                            currentVelocityOfChangingPosition = velocityOfChangingPosition * -1;
-                            direction = possiblePaths["left"];
-                            isMoving = true;
-                        }
-                        else if (direction > possiblePaths["middle"])
-                        {
-                            currentVelocityOfChangingPosition = velocityOfChangingPosition * -1;
-                            direction = possiblePaths["middle"];
-                            isMoving = true;
-                        }
-                        else
+                        if (!TurnLeft())
                         {
                             h = 0;
                         }
@@ -156,7 +175,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             }
 
             // walk speed multiplier
-            if (Input.GetKey(KeyCode.LeftShift)) m_Move *= 0.5f;
+            //if (Input.GetKey(KeyCode.LeftShift)) m_Move *= 0.5f;
 
             // pass all parameters to the character control script
             m_Character.Move(m_Move, crouch, m_Jump);

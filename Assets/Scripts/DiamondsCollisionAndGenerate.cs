@@ -12,7 +12,7 @@ public class DiamondsCollisionAndGenerate : MonoBehaviour
     public Text BestScoreMonitor;
     public int DiamondsOnStart = 15;
     public List<GameObject> DiamondsPrefabs;
-    public int ObstaclesOnStart = 15;
+    public int ObstaclesOnStart = 20;
     public List<GameObject> ObstaclePrefabs;
     public List<GameObject> BackgroundObjPrefabs;
     public GameObject MessageBox;
@@ -21,7 +21,8 @@ public class DiamondsCollisionAndGenerate : MonoBehaviour
     private string nameOfObstacle = "ToDie";
     private string nameOfBackgroundObj = "BackgroundObj";
     private string bestScoreFileName = "/bestScore.txt";
-    private int points;
+    private int collectedPoints;
+    private int uncollectedPoints;
     private float lastCreatedObjectPosstion = 0;
     private float lastCreatedBackgroundObjectPosstion = 0;
     private List<GameObject> createdObject = new List<GameObject>();
@@ -34,7 +35,8 @@ public class DiamondsCollisionAndGenerate : MonoBehaviour
 
     void Start()
     {
-        points = 0;
+        collectedPoints = 0;
+        uncollectedPoints = 0;
         ShowPoints();
 
         if (!File.Exists(Application.persistentDataPath + bestScoreFileName))
@@ -50,7 +52,7 @@ public class DiamondsCollisionAndGenerate : MonoBehaviour
             if (objType == 0)
             {
                 if (ObstaclePrefabs.Count > 0)
-                {// TODO: cos nie dziala czasem, za nisko pozycja ?
+                {
                     CreateNewObject(ObstaclePrefabs);
                     ObstaclesOnStart--;
                 }
@@ -79,6 +81,11 @@ public class DiamondsCollisionAndGenerate : MonoBehaviour
         {
             if (gameCharacterDistance > obj.transform.position.z + 10.0f)
             {
+                if (obj.name.Contains(nameOfDiamond))
+                {
+                    uncollectedPoints++;
+                    //Debug.Log("c: " + collectedPoints + " u: " + uncollectedPoints);
+                }
                 RemoveCreatedObject(obj);
                 break;
             }            
@@ -89,7 +96,7 @@ public class DiamondsCollisionAndGenerate : MonoBehaviour
     {
         if (col.gameObject.name.Contains(nameOfDiamond))
         {
-            points++;
+            collectedPoints++;
             ShowPoints();
             RemoveCreatedObject(col.gameObject);
         }
@@ -101,7 +108,7 @@ public class DiamondsCollisionAndGenerate : MonoBehaviour
 
     private void ShowPoints()
     {
-        PointsMonitor.text = points.ToString();
+        PointsMonitor.text = collectedPoints.ToString();
     }
 
     private void CreateNewBestScoreFile()
@@ -117,12 +124,53 @@ public class DiamondsCollisionAndGenerate : MonoBehaviour
             BestScoreMonitor.text = bestScore;
         }
     }
-    
+
+    /* policy: 
+     * start: 5.0f - 10.0f
+     * >75% collected = obstacle 4.0f-8.0f
+     * >90% collected = obstacle 3.0f-6.0f
+     * <50% collected = diamonds 4.0f-8.0f
+     * <25% collected = diamonds 3.0f-6.0f
+    */
     private void CreateNewObject(List<GameObject> prefabsList)
     {
+        float defaultDistanceStart = 5.0f;
+        float defaultDistanceEnd = 10.0f;
+
+        if (prefabsList.Equals(ObstaclePrefabs))
+        {
+            if (uncollectedPoints > 0 && collectedPoints / uncollectedPoints > 0.75)
+            {
+                defaultDistanceStart = 4.0f;
+                defaultDistanceEnd = 8.0f;
+                //Debug.Log(">75%");
+            }
+            if ((uncollectedPoints == 0 && collectedPoints > 0) || (uncollectedPoints > 0 && collectedPoints / uncollectedPoints > 0.9))
+            {
+                defaultDistanceStart = 3.0f;
+                defaultDistanceEnd = 6.0f;
+                //Debug.Log(">90%");
+            }
+        }
+        if (prefabsList.Equals(DiamondsPrefabs))
+        {
+            if (uncollectedPoints > 0 && collectedPoints / uncollectedPoints < 0.5)
+            {
+                defaultDistanceStart = 4.0f;
+                defaultDistanceEnd = 8.0f;
+                //Debug.Log("<50%");
+            }
+            if (uncollectedPoints > 0 && collectedPoints / uncollectedPoints < 0.25)
+            {
+                defaultDistanceStart = 3.0f;
+                defaultDistanceEnd = 6.0f;
+                //Debug.Log("<25%");
+            }
+        }
+
         int newModelIndex = Random.Range(0, prefabsList.Count);
         float newModelX = possiblePaths.ElementAt(Random.Range(0, possiblePaths.Count)).Value;
-        float distanceForNewModel = Random.Range(5.0f, 12.0f);
+        float distanceForNewModel = Random.Range(defaultDistanceStart, defaultDistanceEnd);
         lastCreatedObjectPosstion += distanceForNewModel;
 
         GameObject newObjectModel = Instantiate(prefabsList[newModelIndex],
@@ -194,9 +242,9 @@ public class DiamondsCollisionAndGenerate : MonoBehaviour
                 
             }
 
-            if (int.Parse(currentBestScore) < points)
+            if (int.Parse(currentBestScore) < collectedPoints)
             {
-                File.WriteAllText(Application.persistentDataPath + bestScoreFileName, points.ToString());
+                File.WriteAllText(Application.persistentDataPath + bestScoreFileName, collectedPoints.ToString());
                 if (textLabel != null)
                 {
                     textLabel.text = "Brawo! Właśnie pobiłeś rekord gry! Spróbuj swoich sił jeszcze raz :)";

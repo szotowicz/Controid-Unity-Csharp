@@ -34,6 +34,6 @@ public class ComputerPanel : MonoBehaviour
 
     public void kick() {
         var ipep = new IPEndPoint(IPAddress.Parse(ip), port);
-        NetworkManager.instance.kickComputer(ipep);
+        NetworkManager.instance.KickComputer(ipep);
     }
 }

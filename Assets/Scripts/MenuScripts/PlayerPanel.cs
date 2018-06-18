@@ -30,6 +30,6 @@ public class PlayerPanel : MonoBehaviour
     public void removePlayer() {
         var obj = new Q_REMOVE_PLAYER();
         obj.name = name;
-        NetworkManager.instance.sendToServer(obj);
+        NetworkManager.instance.SendToServer(obj);
     }
 }

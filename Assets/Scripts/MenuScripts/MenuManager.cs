@@ -19,29 +19,30 @@ public class MenuManager : MonoBehaviour
     }
 
     public void Start() {
-        setMainMenu();
+        SetMainMenu();
         Application.runInBackground = true;
-        NetworkManager.instance.runSerwer();
+        NetworkManager.instance.RunSerwer();
     }
 
     // Update is called once per frame
     void Update() {
-        NetworkManager.instance.update();
+        NetworkManager.instance.Update();
         refreshCoolDown += Time.deltaTime;
         if (refreshCoolDown > refreshRate) {
             OnRefreshButton();
             refreshCoolDown = 0;
         }
+        
     }
 
-    public void setMainMenu() {
-        NetworkManager.instance.disableNetwork();
+    public void SetMainMenu() {
+        NetworkManager.instance.DisableNetwork();
     }
 
     public Color serverColor;
     public string serverName;
 
-    private void randomServerParams() {
+    private void RandomServerParams() {
         int r = UnityEngine.Random.Range(0, 8);
         switch (r) {
             case 0:
@@ -89,8 +90,8 @@ public class MenuManager : MonoBehaviour
 
     public void setServerMenu() {
         //clm.clearData();
-        randomServerParams();
-        NetworkManager.instance.runSerwer();
+        RandomServerParams();
+        NetworkManager.instance.RunSerwer();
         OnRefreshButton();
         ConnectController();
     }
@@ -117,7 +118,7 @@ public class MenuManager : MonoBehaviour
     public void Connect(string ip) {
         try {
             IPEndPoint iped = new IPEndPoint(IPAddress.Parse(ip), NetworkManager.instance.broadcastPort);
-            NetworkManager.instance.connectToSerwer(iped);
+            NetworkManager.instance.ConnectToSerwer(iped);
         }
         catch {
 
@@ -129,14 +130,14 @@ public class MenuManager : MonoBehaviour
     }
 
     public void debugStartGameServer() {
-        NetworkManager.instance.runSerwer();
+        NetworkManager.instance.RunSerwer();
         long seed = UnityEngine.Random.Range(0, int.MaxValue);
         Debug.Log("Debug Start Game Server");
 
         var menuData = new DaneZMenuGlownego();
         List<ComputersListElement> ele = new List<ComputersListElement>();
         var cs = new ComputersListElement();
-        cs.ip = new IPEndPoint(NetworkManager.instance.getMyIp(), NetworkManager.instance.port);
+        cs.ip = new IPEndPoint(NetworkManager.instance.GetMyIp(), NetworkManager.instance.port);
         cs.players.Add(new playerElement() { isAi = true, name = "Bot", id = 0 });
         cs.players.Add(new playerElement() { isAi = false, name = "gracz 1", id = 1 });
         cs.players.Add(new playerElement() { isAi = false, name = "gracz 2", id = 2 });
@@ -167,7 +168,7 @@ public class MenuManager : MonoBehaviour
 
         var start = new Q_START_GAME();
 
-        NetworkManager.instance.sendToAllComputers(start);
+        NetworkManager.instance.SendToAllComputers(start);
         var menuData = new DaneZMenuGlownego();
         menuData.komputeryIGracze = komputeryIGracze;
         PlayGame();//todo menudata
